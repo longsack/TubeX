@@ -1,38 +1,15 @@
 <?php
-// Copyright 2011 JMB Software, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 define('TUBEX_CONTROL_PANEL', true);
 require_once('includes/cp-global.php');
-
 // Send initial response headers
 header("Content-type: text/html; charset: UTF-8");
 NoCacheHeaders();
-
-
 $DB = GetDB();
-
-
-
-
-
 #### Update config.php file =======================================================================================================
 // Update Config.php file to remove PHP_INT_MAX reference
 $config = file_get_contents(BASE_DIR . '/classes/Config.php');
 $config = String::FormatNewlines($config, String::NEWLINE_UNIX);
 $config = str_replace(array('fread($fp, PHP_INT_MAX)', 'fread($fp, 1048576)'), 'fgets($fp)', $config);
-
 if( stristr($config, 'Patched TEMPLATES_DIR') === false )
 {
     $config = str_replace("define('VIDEO_EXTENSIONS', str_replace(array('.',','), array('', '|'), self::\$settings['video_extensions']));",
@@ -40,16 +17,12 @@ if( stristr($config, 'Patched TEMPLATES_DIR') === false )
                           "        define('TEMPLATES_DIR', BASE_DIR . '/templates/' . self::\$settings['template']); // Patched TEMPLATES_DIR\n",
                           $config);
 }
-
-
 if( stristr($config, 'TEMPLATE_COMPILE_DIR') === false )
 {
     $config = str_replace("define('TEMPLATES_DIR', BASE_DIR . '/templates');",
                           "define('TEMPLATE_CACHE_DIR', BASE_DIR . '/templates/_cache');\ndefine('TEMPLATE_COMPILE_DIR', BASE_DIR . '/templates/_compiled');",
                           $config);
 }
-
-
 if( stristr($config, 'spl_autoload_register') === false )
 {
     $config = str_replace("function __autoload(\$class)\n" .
@@ -80,13 +53,6 @@ if( stristr($config, 'spl_autoload_register') === false )
 
 file_put_contents(BASE_DIR . '/classes/Config.php', $config);
 #### Update config.php file =======================================================================================================
-
-
-
-
-
-
-
 #### Update database.xml ==========================================================================================================
 // Update tbx_category with image_id column
 $schema = GetDBSchema(true);
@@ -99,19 +65,14 @@ if( $xcolumns->el('./column[name="image_id"]') === null )
     $xcolumn->addChild('label', 'Image');
     $xcolumn->addChild('definition', 'INT UNSIGNED');
     $xcolumn->addChild('description', 'An image associated with the category');
-
-
     // Setup <admin>
     $xadmin = $xcolumn->addChild('admin');
     $xadmin->addChild('search', 'false');
     $xadmin->addChild('sort', 'false');
     $xadmin->addChild('create', 'true');
     $xadmin->addChild('edit', 'true');
-
     XML_Schema::WriteXml($schema);
 }
-
-
 // Update tbx_video with bulk editing for the duration field
 $schema = GetDBSchema(true);
 $xcolumns = $schema->el('//table[name="tbx_video"]/columns');
@@ -119,12 +80,8 @@ if( $xcolumns->el('./column[name="duration"]/admin/bulkEdit') === null )
 {
     $xadmin = $xcolumns->el('./column[name="duration"]/admin');
     $xadmin->addChild('bulkEdit', 'SET,ADD,SUBTRACT,INCREMENT,DECREMENT');
-
     XML_Schema::WriteXml($schema);
 }
-
-
-
 // Update tbx_video_feed with flag_convert column
 $schema = GetDBSchema(true);
 $xcolumns = $schema->el('//table[name="tbx_video_feed"]/columns');
